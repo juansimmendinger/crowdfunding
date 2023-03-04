@@ -2,6 +2,8 @@
 pragma solidity ^0.8.9;
 
 contract CrowdFunding {
+
+    
     struct Campaign {
         address owner;
         string title;
@@ -17,6 +19,23 @@ contract CrowdFunding {
     mapping(uint256 => Campaign) public campaigns;
 
     uint256 numberOfCampaigns = 0;
+
+    // ##### Events  ##### //
+    event CampaignCreated(
+    uint256 indexed campaignId,
+    address owner,
+    string title,
+    uint256 target,
+    uint256 deadline,
+    string image
+    );
+
+    event DonationReceived(
+    uint256 indexed campaignId,
+    address donor,
+    uint256 amount
+    );
+
 
     function createCampaign(
         address _owner,
@@ -41,6 +60,15 @@ contract CrowdFunding {
         campaign.amountCollected = 0;
         campaign.image = _image;
 
+         emit CampaignCreated(
+        numberOfCampaigns,
+        _owner,
+        _title,
+        _target,
+        _deadline,
+        _image
+        );
+
         numberOfCampaigns++;
 
         return numberOfCampaigns - 1;
@@ -58,6 +86,7 @@ contract CrowdFunding {
 
         if (sent) {
             campaign.amountCollected = campaign.amountCollected + amount;
+            emit DonationReceived(_id, msg.sender, amount);
         }
     }
 
